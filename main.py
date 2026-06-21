@@ -1,8 +1,7 @@
 import psutil
 import time
 import os
-
-boot_time = psutil.boot_time()
+from datetime import datetime
 
 old = psutil.net_io_counters()
 old_recv = old.bytes_recv
@@ -12,22 +11,21 @@ while True:
     os.system("cls")
 
     print("=" * 40)
-    print("         SYSPULSE V7")
+    print("         SYSPULSE V8")
     print("=" * 40)
 
     # Time
-    current_time = time.strftime("%H:%M:%S")
+    current_time = datetime.now().strftime("%H:%M:%S")
     print(f"\nTime: {current_time}")
 
     # Uptime
-    uptime_seconds = time.time() - boot_time
+    uptime_seconds = time.time() - psutil.boot_time()
     hours = int(uptime_seconds // 3600)
     minutes = int((uptime_seconds % 3600) // 60)
-
     print(f"System Uptime: {hours}h {minutes}m")
 
     # CPU
-    cpu = psutil.cpu_percent(interval=0.1)
+    cpu = psutil.cpu_percent(interval=1)
     print(f"\nCPU Usage: {cpu}%")
 
     # RAM
@@ -48,14 +46,14 @@ while True:
     c_drive = psutil.disk_usage("C:\\")
     print(
         f"C Drive: {c_drive.percent}% Used | "
-        f"{round(c_drive.free / (1024**3), 1)} GB Free"
+        f"{round(c_drive.free/(1024**3),1)} GB Free"
     )
 
     try:
         d_drive = psutil.disk_usage("D:\\")
         print(
             f"D Drive: {d_drive.percent}% Used | "
-            f"{round(d_drive.free / (1024**3), 1)} GB Free"
+            f"{round(d_drive.free/(1024**3),1)} GB Free"
         )
     except:
         pass
@@ -83,14 +81,6 @@ while True:
     for proc in psutil.process_iter(['name', 'cpu_percent']):
         try:
             process_name = proc.info['name']
-
-            if process_name in [
-                "System Idle Process",
-                "Idle",
-                "System"
-            ]:
-                continue
-
             cpu_usage = proc.info['cpu_percent']
 
             if cpu_usage > top_cpu:

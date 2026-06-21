@@ -3,12 +3,6 @@ import time
 import os
 from datetime import datetime
 
-
-def bar(percent):
-    filled = int(percent / 10)
-    return "█" * filled + "░" * (10 - filled)
-
-
 old = psutil.net_io_counters()
 old_recv = old.bytes_recv
 old_sent = old.bytes_sent
@@ -16,9 +10,9 @@ old_sent = old.bytes_sent
 while True:
     os.system("cls")
 
-    print("=" * 45)
-    print("              SYSPULSE V9")
-    print("=" * 45)
+    print("=" * 40)
+    print("         SYSPULSE V8")
+    print("=" * 40)
 
     # Time
     current_time = datetime.now().strftime("%H:%M:%S")
@@ -32,18 +26,17 @@ while True:
 
     # CPU
     cpu = psutil.cpu_percent(interval=1)
-    print(f"\nCPU: [{bar(cpu)}] {cpu}%")
+    print(f"\nCPU Usage: {cpu}%")
 
     # RAM
     ram = psutil.virtual_memory()
-    print(f"RAM: [{bar(ram.percent)}] {ram.percent}%")
+    print(f"RAM Usage: {ram.percent}%")
 
     # Battery
     battery = psutil.sensors_battery()
 
     if battery:
-        status = "Charging" if battery.power_plugged else "Discharging"
-        print(f"Battery: {battery.percent}% ({status})")
+        print(f"Battery: {battery.percent}%")
     else:
         print("Battery: Not Detected")
 
@@ -53,14 +46,14 @@ while True:
     c_drive = psutil.disk_usage("C:\\")
     print(
         f"C Drive: {c_drive.percent}% Used | "
-        f"{round(c_drive.free / (1024**3), 1)} GB Free"
+        f"{round(c_drive.free/(1024**3),1)} GB Free"
     )
 
     try:
         d_drive = psutil.disk_usage("D:\\")
         print(
             f"D Drive: {d_drive.percent}% Used | "
-            f"{round(d_drive.free / (1024**3), 1)} GB Free"
+            f"{round(d_drive.free/(1024**3),1)} GB Free"
         )
     except:
         pass
@@ -88,10 +81,6 @@ while True:
     for proc in psutil.process_iter(['name', 'cpu_percent']):
         try:
             process_name = proc.info['name']
-
-            if process_name == "System Idle Process":
-                continue
-
             cpu_usage = proc.info['cpu_percent']
 
             if cpu_usage > top_cpu:
@@ -102,7 +91,7 @@ while True:
             pass
 
     if top_process:
-        print(f"🔥 {top_process} ({top_cpu:.1f}% CPU)")
+        print(f"{top_process} ({top_cpu:.1f}% CPU)")
     else:
         print("No active process found")
 

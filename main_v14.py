@@ -12,9 +12,6 @@ old = psutil.net_io_counters()
 old_recv = old.bytes_recv
 old_sent = old.bytes_sent
 
-cpu_history = []
-ram_history = []
-
 
 def bar(percent, length=20):
     filled = int(percent / 100 * length)
@@ -34,30 +31,16 @@ def bar(percent, length=20):
     )
 
 
-def sparkline(data):
-    chars = "▁▂▃▄▅▆▇█"
-
-    if not data:
-        return ""
-
-    result = ""
-
-    for value in data:
-        index = int((value / 100) * (len(chars) - 1))
-        result += chars[index]
-
-    return result
-
-
 while True:
     os.system("cls")
 
     print(Fore.CYAN + "=" * 60)
-    print(Fore.CYAN + "                    SYSPULSE V15")
+    print(Fore.CYAN + "                    SYSPULSE V14")
     print(Fore.CYAN + "=" * 60)
 
     # Time
     current_time = datetime.now().strftime("%H:%M:%S")
+
     print(f"\nTime: {current_time}")
 
     # Uptime
@@ -118,15 +101,6 @@ while True:
 
     ram = psutil.virtual_memory()
 
-    cpu_history.append(cpu)
-    ram_history.append(ram.percent)
-
-    if len(cpu_history) > 20:
-        cpu_history.pop(0)
-
-    if len(ram_history) > 20:
-        ram_history.pop(0)
-
     print("\n--- Performance ---")
 
     print(
@@ -151,18 +125,6 @@ while True:
 
     print(f"Used RAM: {used_ram} GB")
     print(f"Free RAM: {free_ram} GB")
-
-    print("\n--- Usage History ---")
-
-    print(
-        f"CPU Trend: "
-        f"{sparkline(cpu_history)}"
-    )
-
-    print(
-        f"RAM Trend: "
-        f"{sparkline(ram_history)}"
-    )
 
     # CPU Cores
     print("\n--- CPU Core Usage ---")

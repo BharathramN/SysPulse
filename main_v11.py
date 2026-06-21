@@ -3,7 +3,6 @@ import time
 import os
 import platform
 from datetime import datetime
-from cpuinfo import get_cpu_info
 
 def progress_bar(percent, length=20):
     filled = int(percent / 100 * length)
@@ -17,7 +16,7 @@ while True:
     os.system("cls")
 
     print("=" * 50)
-    print("              SYSPULSE V12")
+    print("              SYSPULSE V11")
     print("=" * 50)
 
     # Time
@@ -43,31 +42,14 @@ while True:
 
     print(f"Total RAM: {total_ram} GB")
 
-    # CPU Details
-    print("\n--- CPU Details ---")
-
-    try:
-        cpu_info = get_cpu_info()
-
-        print(f"CPU Name: {cpu_info['brand_raw']}")
-
-        freq = psutil.cpu_freq()
-
-        if freq:
-            print(f"Current Frequency: {freq.current:.0f} MHz")
-            print(f"Max Frequency: {freq.max:.0f} MHz")
-
-    except:
-        print("CPU information unavailable")
-
-    # CPU Usage
+    # CPU
     cpu = psutil.cpu_percent(interval=1)
 
-    print("\n--- CPU Usage ---")
+    print("\n--- CPU ---")
     print(f"[{progress_bar(cpu)}] {cpu}%")
 
-    # RAM Usage
-    print("\n--- RAM Usage ---")
+    # RAM
+    print("\n--- RAM ---")
     print(f"[{progress_bar(ram.percent)}] {ram.percent}%")
 
     # Battery
@@ -80,17 +62,6 @@ while True:
 
         if battery.power_plugged:
             print("⚡ Charging")
-
-        else:
-            if battery.secsleft > 0:
-                b_hours = battery.secsleft // 3600
-                b_minutes = (battery.secsleft % 3600) // 60
-
-                print(
-                    f"Time Remaining: "
-                    f"{b_hours}h {b_minutes}m"
-                )
-
     else:
         print("Battery Not Detected")
 
@@ -103,7 +74,6 @@ while True:
         f"C Drive [{progress_bar(c_drive.percent)}] "
         f"{c_drive.percent}%"
     )
-
     print(
         f"Free Space: "
         f"{round(c_drive.free/(1024**3),1)} GB"
@@ -116,7 +86,6 @@ while True:
             f"D Drive [{progress_bar(d_drive.percent)}] "
             f"{d_drive.percent}%"
         )
-
         print(
             f"Free Space: "
             f"{round(d_drive.free/(1024**3),1)} GB"
@@ -154,7 +123,9 @@ while True:
     top_process = None
     top_cpu = 0
 
-    for proc in psutil.process_iter(['name', 'cpu_percent']):
+    for proc in psutil.process_iter(
+        ['name', 'cpu_percent']
+    ):
         try:
             process_name = proc.info['name']
 
@@ -171,7 +142,10 @@ while True:
             pass
 
     if top_process:
-        print(f"🔥 {top_process} ({top_cpu:.1f}% CPU)")
+        print(
+            f"🔥 {top_process} "
+            f"({top_cpu:.1f}% CPU)"
+        )
     else:
         print("No active process found")
 

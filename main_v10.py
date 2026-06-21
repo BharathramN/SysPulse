@@ -4,10 +4,6 @@ import os
 import platform
 from datetime import datetime
 
-def progress_bar(percent, length=20):
-    filled = int(percent / 100 * length)
-    return "█" * filled + "░" * (length - filled)
-
 old = psutil.net_io_counters()
 old_recv = old.bytes_recv
 old_sent = old.bytes_sent
@@ -16,7 +12,7 @@ while True:
     os.system("cls")
 
     print("=" * 50)
-    print("              SYSPULSE V11")
+    print("              SYSPULSE V10")
     print("=" * 50)
 
     # Time
@@ -30,66 +26,58 @@ while True:
 
     print(f"System Uptime: {hours}h {minutes}m")
 
+    # CPU
+    cpu = psutil.cpu_percent(interval=1)
+
+    # RAM
+    ram = psutil.virtual_memory()
+
     # System Info
     print("\n--- System Info ---")
-
     print(f"OS: {platform.system()} {platform.release()}")
     print(f"CPU Cores: {psutil.cpu_count(logical=False)}")
     print(f"CPU Threads: {psutil.cpu_count(logical=True)}")
 
-    ram = psutil.virtual_memory()
     total_ram = round(ram.total / (1024**3), 1)
-
     print(f"Total RAM: {total_ram} GB")
 
-    # CPU
-    cpu = psutil.cpu_percent(interval=1)
-
-    print("\n--- CPU ---")
-    print(f"[{progress_bar(cpu)}] {cpu}%")
-
-    # RAM
-    print("\n--- RAM ---")
-    print(f"[{progress_bar(ram.percent)}] {ram.percent}%")
+    # CPU / RAM Usage
+    print(f"\nCPU Usage: {cpu}%")
+    print(f"RAM Usage: {ram.percent}%")
 
     # Battery
-    print("\n--- Battery ---")
-
     battery = psutil.sensors_battery()
 
     if battery:
-        print(f"[{progress_bar(battery.percent)}] {battery.percent}%")
-
         if battery.power_plugged:
-            print("⚡ Charging")
+            print(f"Battery: {battery.percent}% (Charging)")
+        else:
+            print(f"Battery: {battery.percent}%")
     else:
-        print("Battery Not Detected")
+        print("Battery: Not Detected")
 
     # Storage
     print("\n--- Storage ---")
 
-    c_drive = psutil.disk_usage("C:\\")
+    bar_length = 20
 
-    print(
-        f"C Drive [{progress_bar(c_drive.percent)}] "
-        f"{c_drive.percent}%"
-    )
-    print(
-        f"Free Space: "
-        f"{round(c_drive.free/(1024**3),1)} GB"
-    )
+    c_drive = psutil.disk_usage("C:\\")
+    filled = int(c_drive.percent / 100 * bar_length)
+
+    bar = "█" * filled + "░" * (bar_length - filled)
+
+    print(f"C Drive [{bar}] {c_drive.percent}%")
+    print(f"Free Space: {round(c_drive.free/(1024**3),1)} GB")
 
     try:
         d_drive = psutil.disk_usage("D:\\")
 
-        print(
-            f"D Drive [{progress_bar(d_drive.percent)}] "
-            f"{d_drive.percent}%"
-        )
-        print(
-            f"Free Space: "
-            f"{round(d_drive.free/(1024**3),1)} GB"
-        )
+        filled = int(d_drive.percent / 100 * bar_length)
+
+        bar = "█" * filled + "░" * (bar_length - filled)
+
+        print(f"D Drive [{bar}] {d_drive.percent}%")
+        print(f"Free Space: {round(d_drive.free/(1024**3),1)} GB")
 
     except:
         pass
@@ -99,17 +87,8 @@ while True:
 
     new = psutil.net_io_counters()
 
-    download_speed = (
-        (new.bytes_recv - old_recv)
-        / 1024
-        / 1024
-    )
-
-    upload_speed = (
-        (new.bytes_sent - old_sent)
-        / 1024
-        / 1024
-    )
+    download_speed = (new.bytes_recv - old_recv) / 1024 / 1024
+    upload_speed = (new.bytes_sent - old_sent) / 1024 / 1024
 
     print(f"Download: {download_speed:.2f} MB/s")
     print(f"Upload:   {upload_speed:.2f} MB/s")
@@ -123,9 +102,7 @@ while True:
     top_process = None
     top_cpu = 0
 
-    for proc in psutil.process_iter(
-        ['name', 'cpu_percent']
-    ):
+    for proc in psutil.process_iter(['name', 'cpu_percent']):
         try:
             process_name = proc.info['name']
 
@@ -142,10 +119,7 @@ while True:
             pass
 
     if top_process:
-        print(
-            f"🔥 {top_process} "
-            f"({top_cpu:.1f}% CPU)"
-        )
+        print(f"🔥 {top_process} ({top_cpu:.1f}% CPU)")
     else:
         print("No active process found")
 

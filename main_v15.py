@@ -47,24 +47,14 @@ def sparkline(data):
         result += chars[index]
 
     return result
-def status_icon(percent):
-    if percent < 50:
-        return "🟢"
-    elif percent < 80:
-        return "🟡"
-    else:
-        return "🔴"
-
-
-def box_title(title):
-    print(f"\n┌─ {title} " + "─" * (50 - len(title)) + "┐")
 
 
 while True:
     os.system("cls")
-    print(Fore.CYAN + "╔══════════════════════════════════════════════════════╗")
-    print(Fore.CYAN + "║                    SYSPULSE V16                    ║")
-    print(Fore.CYAN + "╚══════════════════════════════════════════════════════╝")
+
+    print(Fore.CYAN + "=" * 60)
+    print(Fore.CYAN + "                    SYSPULSE V15")
+    print(Fore.CYAN + "=" * 60)
 
     # Time
     current_time = datetime.now().strftime("%H:%M:%S")
@@ -79,7 +69,7 @@ while True:
     print(f"System Uptime: {hours}h {minutes}m")
 
     # System Info
-    box_title("SYSTEM")
+    print("\n--- System Info ---")
 
     print(f"OS: {platform.system()} {platform.release()}")
 
@@ -101,7 +91,7 @@ while True:
     print(f"Total RAM: {total_ram} GB")
 
     # CPU Details
-    box_title("CPU DETAILS")
+    print("\n--- CPU Details ---")
 
     cpu_info = cpuinfo.get_cpu_info()
 
@@ -137,18 +127,16 @@ while True:
     if len(ram_history) > 20:
         ram_history.pop(0)
 
-    box_title("PERFORMANCE")
+    print("\n--- Performance ---")
 
     print(
-    f"{status_icon(cpu)} CPU "
-    f"[{bar(cpu)}] "
-    f"{cpu}%"
+        f"CPU [{bar(cpu)}] "
+        f"{cpu}%"
     )
 
     print(
-    f"{status_icon(ram.percent)} RAM "
-    f"[{bar(ram.percent)}] "
-    f"{ram.percent}%"
+        f"RAM [{bar(ram.percent)}] "
+        f"{ram.percent}%"
     )
 
     used_ram = round(
@@ -194,7 +182,8 @@ while True:
     # Battery
     battery = psutil.sensors_battery()
 
-    box_title("BATTERY")
+    print("\n--- Battery ---")
+
     if battery:
 
         charging = (
@@ -224,7 +213,7 @@ while True:
         print("Battery Not Detected")
 
     # Storage
-    box_title("STORAGE")
+    print("\n--- Storage ---")
 
     c_drive = psutil.disk_usage("C:\\")
 
@@ -255,7 +244,7 @@ while True:
         pass
 
     # Network
-    box_title("NETWORK")
+    print("\n--- Network ---")
 
     new = psutil.net_io_counters()
 
@@ -285,7 +274,7 @@ while True:
     old_sent = new.bytes_sent
 
     # Top Processes
-    box_title("TOP PROCESSES")
+    print("\n--- Top Processes ---")
 
     processes = []
 

@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import psutil
 import wmi
+import time
 c=wmi.WMI()
 from datetime import datetime
 
@@ -8,29 +9,51 @@ ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
 app = ctk.CTk()
-app.title("SysPulse v1.8")
-app.geometry("500x500")
+app.title("SysPulse Beta v2.0")
+app.geometry("600x820")
 
 title = ctk.CTkLabel(
     app,
-    text="SYSPULSE v1.8",
-    font=("Arial", 24, "bold")
+    text="⚡ SYSPULSE™🚀",
+    font=("Segoe UI", 32, "bold"),
+    text_color="#00E5FF"
 )
 title.pack(pady=15)
+subtitle = ctk.CTkLabel(
+    app,
+    text="Next Generation System Monitor for Windows 10/11🚀",
+    font=("Segoe UI", 12),
+    text_color="gray"
+)
+subtitle.pack()
+version_label = ctk.CTkLabel(
+    app,
+    text="Version 2.0 Stable",
+    font=("Segoe UI", 11),
+    text_color="#888888"
+)
+version_label.pack(pady=(0, 15))
+separator = ctk.CTkLabel(
+    app,
+    text="────────────────────",
+    text_color="#444444"
+)
+separator.pack(pady=(0,10))
 
 # =========================
 # SYSTEM INFO
 # =========================
 
 import platform
-import cpuinfo
+import wmi
 
-cpu_info = cpuinfo.get_cpu_info()
-
+c = wmi.WMI()
+cpu_name = c.Win32_Processor()[0].Name
 specs_title = ctk.CTkLabel(
     app,
     text="SYSTEM INFO",
-    font=("Segoe UI", 20, "bold")
+    font=("Segoe UI", 20, "bold"),
+    text_color="#00D4FF"
 )
 specs_title.pack(pady=(10, 5))
 
@@ -81,6 +104,25 @@ gpu_label = ctk.CTkLabel(
     font=("Segoe UI", 14)
 )
 gpu_label.pack()
+uptime_label = ctk.CTkLabel(
+    app,
+    text="Uptime: Loading...",
+    font=("Segoe UI", 14)
+)
+uptime_label.pack()
+cpu_temp_label = ctk.CTkLabel(
+    app,
+    text="🌡️ CPU Temp: N/A",
+    font=("Segoe UI", 14)
+)
+cpu_temp_label.pack()
+
+gpu_temp_label = ctk.CTkLabel(
+    app,
+    text="🌡️GPU Temp: N/A",
+    font=("Segoe UI", 14)
+)
+gpu_temp_label.pack()
 
 time_label = ctk.CTkLabel(app, text="")
 time_label.pack()
@@ -101,6 +143,11 @@ battery_label = ctk.CTkLabel(app, text="")
 battery_label.pack(pady=10)
 battery_bar = ctk.CTkProgressBar(app, width=300)
 battery_bar.pack()
+disk_label = ctk.CTkLabel(
+    app,
+    text=""
+)
+disk_label.pack(pady=5)
 
 
 network_label = ctk.CTkLabel(app, text="")
@@ -115,160 +162,185 @@ old_sent = old.bytes_sent
 
 
 def update_stats():
-    global old_recv
-    global old_sent
+        print("Updating stats...")
+        global old_recv
+        global old_sent
 
-    os_label.configure(
-        text=f"OS: {platform.system()} {platform.release()}"
-    )
+        os_label.configure(
+            text=f"🪟 OS: {platform.system()} {platform.release()}"
+        )
 
-    cpu_name_label.configure(
-        text=f"CPU: {cpu_info['brand_raw']}"
-    )
+        cpu_name_label.configure(
+            text=f"🧠 CPU: {cpu_name}"
+        )
 
-    cores_label.configure(
-        text=f"Cores: {psutil.cpu_count(logical=False)}"
-    )
+        cores_label.configure(
+            text=f"⚙️ Cores: {psutil.cpu_count(logical=False)}"
+        )
 
-    threads_label.configure(
-        text=f"Threads: {psutil.cpu_count(logical=True)}"
-    )
+        threads_label.configure(
+            text=f"🧵 Threads: {psutil.cpu_count(logical=True)}"
+        )
 
-    total_ram = round(
-        psutil.virtual_memory().total /
-        (1024 ** 3),
-        1
-    )
+        total_ram = round(
+            psutil.virtual_memory().total /
+            (1024 ** 3),
+            1
+        )
 
-    ram_total_label.configure(
-        text=f"Total RAM: {total_ram} GB"
+        ram_total_label.configure(
+            text=f"💾 Total RAM: {total_ram} GB"
+        )
+        boot_time = psutil.boot_time()
+
+        uptime_seconds = int(time.time() - boot_time)
+
+        days = uptime_seconds // 86400
+        hours = (uptime_seconds % 86400) // 3600
+        minutes = (uptime_seconds % 3600) // 60
+
+        uptime_label.configure(
+            text=f"⌛ Uptime: {days}d {hours}h {minutes}m"
     )
-    try:
-        gpus = c.Win32_VideoController()
-        if gpus:
+        try:
+            gpus = c.Win32_VideoController()
+            gpu_names = []
+            for gpu in gpus:
+                if gpu.Name and gpu.Name not in gpu_names:
+                                
+                                gpu_names.append(gpu.Name)
+
             gpu_label.configure(
-                text=f"GPU: {gpus[0].Name}"
+            text="🎮 GPU: " + " | ".join(gpu_names)
             )
-    except:
-        gpu_label.configure(
-            text="GPU: Not Detected"
-        )
 
-os_label.configure(
-    text=f"OS: {platform.system()} {platform.release()}"
-)
-
-cpu_name_label.configure(
-    text=f"CPU: {cpu_info['brand_raw']}"
-)
-
-cores_label.configure(
-    text=f"Cores: {psutil.cpu_count(logical=False)}"
-)
-
-threads_label.configure(
-    text=f"Threads: {psutil.cpu_count(logical=True)}"
-)
-
-total_ram = round(
-    psutil.virtual_memory().total /
-    (1024 ** 3),
-    1
-)
-
-ram_total_label.configure(
-    text=f"Total RAM: {total_ram} GB"
-)
+        except Exception:
+            gpu_label.configure(
+                text="🎮 GPU: Not Detected"
+            )
 
 
-freq = psutil.cpu_freq()
+        disk = psutil.disk_usage("C:")
 
-if freq:
-    freq_label.configure(
-        text=f"Frequency: {freq.current:.0f} MHz"
-    )
-    
-    current_time = datetime.now().strftime("%H:%M:%S")
+        disk_label.configure(
+        text=f"Disk Usage: {disk.percent}%"
+        )   
 
-    cpu = psutil.cpu_percent()
-    ram = psutil.virtual_memory()
+   
 
-    battery = psutil.sensors_battery()
 
-    new = psutil.net_io_counters()
+        freq = psutil.cpu_freq()
+        
 
-    download = (
-        (new.bytes_recv - old_recv)
-        / 1024
-        / 1024
-    )
+        if freq:
+            
+            freq_label.configure(
+                text=f"⏱️ Frequency: {freq.current:.0f} MHz"
+            )
+            
+            current_time = datetime.now().strftime("%H:%M:%S")
 
-    upload = (
-        (new.bytes_sent - old_sent)
-        / 1024
-        / 1024
-    )
+            cpu = psutil.cpu_percent()
+            ram = psutil.virtual_memory()
 
-    old_recv = new.bytes_recv
-    old_sent = new.bytes_sent
+            battery = psutil.sensors_battery()
 
-    time_label.configure(
-        text=f"Time: {current_time}"
-    )
+            new = psutil.net_io_counters()
 
-    cpu_label.configure(
-        text=f"CPU Usage: {cpu}%"
-    )
+            download = (
+                (new.bytes_recv - old_recv)
+                / 1024
+                / 1024
+            )
 
-    cpu_bar.set(cpu / 100)
+            upload = (
+                (new.bytes_sent - old_sent)
+                / 1024
+                / 1024
+            )
 
-    ram_label.configure(
-        text=f"RAM Usage: {ram.percent}%"
-    )
+            old_recv = new.bytes_recv
+            old_sent = new.bytes_sent
 
-    ram_bar.set(ram.percent / 100)
+            time_label.configure(
+                text=f"Time: {current_time}"
+            )
 
-    if battery:
-        status = (
-        "⚡ Charging"
-        if battery.power_plugged
-        else "🔋 Discharging"
-    )
+            cpu_label.configure(
+                text=f"CPU Usage: {cpu}%"
+            )
 
-        battery_label.configure(
-        text=f"Battery: {battery.percent}% | {status}"
-        )
+            cpu_bar.set(cpu / 100)
+            if cpu < 50:
+                cpu_bar.configure(progress_color="green")
+            elif cpu < 80:
+                cpu_bar.configure(progress_color="orange")
+            else:
+                cpu_bar.configure(progress_color="red")
 
-        battery_bar.set(
-        battery.percent / 100
-        )
+            ram_label.configure(
+                text=f"RAM Usage: {ram.percent}%"
+            )
 
-    if battery.percent >= 70:
+            ram_bar.set(ram.percent / 100)
+            if ram.percent < 50:
+                ram_bar.configure(progress_color="green")
+            elif ram.percent < 80:
+                ram_bar.configure(progress_color="orange")
+            else:
+                ram_bar.configure(progress_color="red")
 
-        battery_bar.configure(
-            progress_color="green"
-        )
+            if battery:
+                status = (
+                "⚡ Charging"
+                if battery.power_plugged
+                else "🔋 Discharging"
+            )
 
-    elif battery.percent >= 40:
+                battery_label.configure(
+                text=f"Battery: {battery.percent}% | {status}"
+                )
 
-        battery_bar.configure(
-            progress_color="yellow"
-        )
+                battery_bar.set(
+                battery.percent / 100
+                )
 
-    else:
+            if battery.percent >= 70:
 
-        battery_bar.configure(
-            progress_color="red"
-        )
+                battery_bar.configure(
+                    progress_color="green"
+                )
 
-else:
+            elif battery.percent >= 40:
 
-    battery_label.configure(
-        text="Battery: Not Detected"
-    )
+                battery_bar.configure(
+                    progress_color="yellow"
+                )
 
-    battery_bar.set(0)
+            else:
+
+                battery_bar.configure(
+                    progress_color="red"
+                )
+
+        else:
+
+            battery_label.configure(
+                text="Battery: Not Detected"
+            )
+
+            battery_bar.set(0)
+        print("Updating stats...")
+        app.after(1000, update_stats)
 
 update_stats()
 
+footer = ctk.CTkLabel(
+    app,
+    text="SysPulse™ v2.0 Stable  |  © 2026 Bharathram",
+    font=("Segoe UI", 10),
+    text_color="#00D4FF"
+)
+footer.pack(side="bottom", pady=(10, 20))
 app.mainloop()
+
